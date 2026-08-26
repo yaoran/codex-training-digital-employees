@@ -1,0 +1,8 @@
+interface:
+  display_name: "任务执行数字员工"
+  short_description: "把零散业务要求拆成可执行任务与验收清单"
+  brand_color: "#2563EB"
+  default_prompt: "使用 $task-execution-employee 把我上传的业务要求整理成可直接打开的 HTML 任务包。"
+
+policy:
+  allow_implicit_invocation: true

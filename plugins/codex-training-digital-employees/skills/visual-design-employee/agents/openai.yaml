@@ -1,0 +1,8 @@
+interface:
+  display_name: "视觉设计数字员工"
+  short_description: "根据业务 brief 制作图片、封面或宣传海报"
+  brand_color: "#DB2777"
+  default_prompt: "使用 $visual-design-employee 根据我的业务 brief 制作一张本地视觉成品。"
+
+policy:
+  allow_implicit_invocation: true

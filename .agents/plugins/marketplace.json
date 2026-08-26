@@ -1,0 +1,20 @@
+{
+  "name": "yaoran-open-source",
+  "interface": {
+    "displayName": "Yaoran Open Source"
+  },
+  "plugins": [
+    {
+      "name": "codex-training-digital-employees",
+      "source": {
+        "source": "local",
+        "path": "./plugins/codex-training-digital-employees"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

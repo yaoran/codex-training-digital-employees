@@ -1,0 +1,35 @@
+{
+  "name": "codex-training-digital-employees",
+  "version": "0.1.0",
+  "description": "面向真实办公材料的任务执行、会议纪要与视觉设计数字员工",
+  "author": {
+    "name": "郭振耀"
+  },
+  "keywords": [
+    "digital-employees",
+    "productivity",
+    "task-planning",
+    "meeting-minutes",
+    "visual-design"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "办公数字员工",
+    "shortDescription": "一次安装，使用三位本地办公数字员工",
+    "longDescription": "把真实业务材料整理为可执行任务包、响应式会议纪要或本地视觉成品。默认只生成本地成果，不执行外部发送、发布、付款、删除或第三方系统写入。",
+    "developerName": "郭振耀",
+    "category": "Productivity",
+    "capabilities": [
+      "任务规划与验收",
+      "会议纪要整理",
+      "视觉设计 brief 与成品"
+    ],
+    "defaultPrompt": [
+      "帮我从真实业务材料中选择最适合开始的一位数字员工。",
+      "使用 $task-execution-employee 把我的想法整理成可执行的本地 HTML 任务包。",
+      "使用 $meeting-minutes-employee 把会议附件整理成适配手机阅读的 HTML 纪要。",
+      "使用 $visual-design-employee 根据业务 brief 制作本地视觉成品。"
+    ],
+    "brandColor": "#1D4ED8"
+  }
+}
