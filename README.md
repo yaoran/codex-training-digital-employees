@@ -58,6 +58,15 @@ python3 -m unittest discover -s tests -v
 python3 plugins/codex-training-digital-employees/scripts/check_html_safety.py <生成的文件.html>
 ```
 
+视觉成品的 Brief 已明确 PNG 像素尺寸时，使用尺寸检查脚本做精确验收：
+
+```bash
+python3 plugins/codex-training-digital-employees/scripts/check_image_dimensions.py \
+  <视觉成品.png> --width <期望宽度> --height <期望高度>
+```
+
+尺寸检查通过不代表构图、文案或素材授权已经验收，仍需实际查看图片。
+
 ## 开源范围
 
 当前版本只包含郭振耀原创的三项 Skill。原本地教学版中的 `ppt-master` 未纳入此仓库，因为其第三方来源和再分发授权仍需单独核验。
