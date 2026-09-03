@@ -7,6 +7,7 @@ import argparse
 import os
 import stat
 import struct
+import zlib
 from pathlib import Path
 
 
@@ -29,16 +30,52 @@ def read_png_dimensions(path: Path) -> tuple[int, int]:
         file_stat = os.fstat(descriptor)
         if not stat.S_ISREG(file_stat.st_mode):
             raise ValueError("PNG 必须是普通文件")
-        header = os.read(descriptor, 24)
+
+        with os.fdopen(descriptor, "rb", closefd=False) as handle:
+            if handle.read(8) != PNG_SIGNATURE:
+                raise ValueError("文件不是有效的 PNG")
+
+            width = height = None
+            has_idat = False
+            has_iend = False
+            first_chunk = True
+            while not has_iend:
+                chunk_header = handle.read(8)
+                if len(chunk_header) != 8:
+                    raise ValueError("PNG 数据被截断")
+                length, chunk_type = struct.unpack(">I4s", chunk_header)
+                if handle.tell() + length + 4 > file_stat.st_size:
+                    raise ValueError("PNG 数据被截断")
+
+                chunk_data = handle.read(length)
+                chunk_crc = handle.read(4)
+                if len(chunk_data) != length or len(chunk_crc) != 4:
+                    raise ValueError("PNG 数据被截断")
+                expected_crc = struct.unpack(">I", chunk_crc)[0]
+                actual_crc = zlib.crc32(chunk_type + chunk_data) & 0xFFFFFFFF
+                if actual_crc != expected_crc:
+                    raise ValueError("PNG chunk CRC 校验失败")
+
+                if first_chunk:
+                    if chunk_type != b"IHDR" or length != 13:
+                        raise ValueError("PNG 缺少有效的 IHDR")
+                    width, height = struct.unpack(">II", chunk_data[:8])
+                    first_chunk = False
+                elif chunk_type == b"IHDR":
+                    raise ValueError("PNG 包含重复的 IHDR")
+
+                if chunk_type == b"IDAT":
+                    has_idat = True
+                elif chunk_type == b"IEND":
+                    if length != 0 or handle.read(1):
+                        raise ValueError("PNG 的 IEND 无效")
+                    has_iend = True
     finally:
         os.close(descriptor)
 
-    if len(header) != 24 or header[:8] != PNG_SIGNATURE:
-        raise ValueError("文件不是有效的 PNG")
-    if header[8:16] != b"\x00\x00\x00\rIHDR":
-        raise ValueError("PNG 缺少有效的 IHDR")
-
-    width, height = struct.unpack(">II", header[16:24])
+    if not has_idat:
+        raise ValueError("PNG 缺少 IDAT 图像数据")
+    assert width is not None and height is not None
     if width == 0 or height == 0:
         raise ValueError("PNG 宽高必须大于 0")
     return width, height
