@@ -54,6 +54,30 @@ class ImageDimensionTests(unittest.TestCase):
             image.write_bytes(b"not a png")
             self.assertTrue(checker.validate_png(image, expected_width=64, expected_height=32))
 
+    def test_truncated_png_header_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            image = Path(directory) / "visual.png"
+            image.write_bytes(
+                checker.PNG_SIGNATURE
+                + b"\x00\x00\x00\rIHDR"
+                + struct.pack(">II", 64, 32)
+            )
+            self.assertTrue(checker.validate_png(image, expected_width=64, expected_height=32))
+
+    def test_corrupt_png_chunk_crc_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            image = Path(directory) / "visual.png"
+            contents = bytearray(make_png(64, 32))
+            contents[32] ^= 0x01
+            image.write_bytes(contents)
+            self.assertTrue(checker.validate_png(image, expected_width=64, expected_height=32))
+
+    def test_png_without_iend_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            image = Path(directory) / "visual.png"
+            image.write_bytes(make_png(64, 32)[:-12])
+            self.assertTrue(checker.validate_png(image, expected_width=64, expected_height=32))
+
     def test_symlink_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
